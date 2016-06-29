@@ -5,15 +5,24 @@ import pprint
 import codecs
 import json
 from datetime import datetime
+import os
 
 
-from os import listdir
-
+states = {
+    'New South Wales': 'NSW',
+    'Victoria': 'VIC',
+    'Queensland': 'QLD',
+    'South Australia': 'SA',
+    'Western Australia': 'WA',
+    'Tasmania': 'TAS',
+    'Australian Capital Territory': 'ACT',
+    'Northern Territory': 'NT'
+}
 
 
 def find_xls_filenames(suffix=".xls" ):
-    filenames = listdir('./')
-    return [ filename for filename in filenames if filename.endswith( suffix ) ]
+    filenames = os.listdir('./')
+    return [ filename for filename in filenames if filename.endswith(suffix)]
 
 
 def parse_file(datafile):
@@ -34,11 +43,14 @@ def parse_file(datafile):
             cell_obj = sheet.cell(0, col_idx) 
             title = cell_obj.value.split(' ; ')
             field_name = title[3].replace(' ;','').strip()
-            state = title[1].strip()
+            state = states[title[1].strip()]
             value = sheet.cell(row_idx, col_idx).value
             if value == "":
                 value = 0
-            item = {'state': state, 'period':month_string, 'sector': field_name, 'value': value}
+            item = {'state': state,
+                'period':month_string,
+                'sector': field_name,
+                'value': value}
             data.append(item)
     return data
 
@@ -56,6 +68,6 @@ def getData():
 
 data = getData()
 file_out = "{0}.json".format("data")
-with open(file_out, 'w') as outfile:
+with open(os.path.join(os.pardir, file_out), "w") as outfile:
     json.dump(data, outfile, indent=4)
 
