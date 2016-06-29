@@ -1,8 +1,9 @@
+var sectors = d3.set();
+var states = d3.set();
 function draw(data) {
     "use strict";
     var dateFormat = d3.time.format("%Y-%m-%d");
-    var sectors = d3.set();
-    var states = d3.set();
+
     data.forEach(function(d) {
         d["period"] = dateFormat.parse(d["period"]);
         sectors.add(d['sector']);
@@ -95,9 +96,10 @@ function createLineChart(data) {
 
 
 function createBarChart(data) {
-     var margin = 75,
-        width = 500 - margin,
-        height = 500 - margin;
+    var margin = {top: 75, right: 20, bottom: 75, left: 100},
+        width = 500 - margin.left - margin.right,
+        height = 500 - margin.top - margin.bottom;
+    
     var nested_data = d3.nest()
         .key(function(d) {
             return d['state'];
@@ -105,42 +107,71 @@ function createBarChart(data) {
         .rollup(aggregate)
         .entries(data);
    
-    var svg = d3.select("#chart2")
-            .append("svg")
-            .attr("width", width + margin)
-            .attr("height", height + margin)
-            .append('g')
+    var xScale = d3.scale.ordinal()
+        .rangeRoundBands([0, width], .1)
+        .domain(states.values());
 
-    var value_extent = d3.extent(nested_data, function(d){
+    var xAxis = d3.svg.axis()
+        .scale(xScale)
+        .orient("bottom");
+
+
+    var yExtent = d3.extent(nested_data, function(d){
         return d.values['value'];
     });
+    
+    var yScale = d3.scale.linear()
+        .range([height, 0])
+        .domain(yExtent);
+    
+    var yAxis = d3.svg.axis()
+        .scale(yScale)
+        .orient("left");
 
-    var value_scale = d3.scale.linear()
-        .range([height, margin])
-        .domain(value_extent);
-    var value_axis = d3.svg.axis()
-      .scale(value_scale)
-      .orient("left");
-    var barWidth = (width / nested_data.length) - 10;
-    var bar = svg.selectAll("g")
+    var svg = d3.select("#chart2")
+        .append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    svg.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + height + ")")
+        .call(xAxis)
+        .selectAll('text')
+        .style("text-anchor", "end")
+        .attr("dx", "-.8em")
+        .attr("dy", ".15em")
+        .attr("transform", "rotate(-65)");
+    svg.append("text")             // text label for the x axis
+        .attr("x", (width / 2) )
+        .attr("y",  height + 50)
+        .attr("dy", ".75em")
+        .attr("class", "axis_title")
+        .text("State");
+
+
+    svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis);
+    
+
+    svg.selectAll(".bar")
         .data(nested_data)
         .enter()
-        .append("g")
-        .attr("transform", function(d, i) { 
-            return "translate(" + (i * barWidth + margin + 10) + ",0)"; 
-        });
-    bar.append("rect")
+        .append("rect")
+        .attr("class", "bar")
+        .attr("x", function(d) { 
+            return xScale(d.key); 
+        })
+        .attr("width", xScale.rangeBand())
         .attr("y", function(d) { 
-            return value_scale(d.values['value']); 
+            return yScale(d.values['value']); 
         })
         .attr("height", function(d) { 
-            return height - value_scale(d.values['value']); 
-        })
-        .attr("width", barWidth - 1);
-    svg.append('g')
-        .attr('class', 'y axis')
-        .attr('transform', "translate(" + margin +", 0)")
-        .call(value_axis);
+            return height - yScale(d.values['value']); 
+    });  
 }
 
 function aggregate(leaves) {
