@@ -19,6 +19,30 @@ states = {
     'Northern Territory': 'NT'
 }
 
+sectors = {
+    'Aged care facilities': 'Aged care facilities',
+    'Agricultural and aquacultural buildings': 'Agricultural',
+    'Commercial Buildings - Total': 'Commercial',
+    'Commercial buildings n.e.c.': 'Commercial',
+    'Education buildings': 'Education',
+    'Entertainment and recreation buildings': 'Recreation',
+    'Factories and other secondary production buildings': 'Industrial',
+    'Health buildings': 'Health',
+    'Industrial Buildings - Total': 'Industrial',
+    'Offices': 'Offices',
+    'Other Non-residential - Total': 'Other',
+    'Other industrial buildings n.e.c.': 'Industrial',
+    'Other non-residential n.e.c.': 'Other',
+    'Religion buildings': 'Religion',
+    'Retail and wholesale trade buildings': 'Retail',
+    'Short term accommodation buildings': 'Accommodation',
+    'Total Non-residential': 'Other',
+    'Transport buildings': 'Transport',
+    'Warehouses': 'Warehouses'
+
+
+}
+
 
 def find_xls_filenames(suffix=".xls" ):
     filenames = os.listdir('./')
@@ -43,13 +67,14 @@ def parse_file(datafile):
             cell_obj = sheet.cell(0, col_idx) 
             title = cell_obj.value.split(' ; ')
             field_name = title[3].replace(' ;','').strip()
+            sector = sectors[field_name]
             state = states[title[1].strip()]
             value = sheet.cell(row_idx, col_idx).value
             if value == "":
                 value = 0
             item = {'state': state,
                 'period':month_string,
-                'sector': field_name,
+                'sector': sector,
                 'value': value}
             data.append(item)
     return data
