@@ -75,7 +75,7 @@ def parse_file(datafile):
             item = {'state': state,
                 'period':month_string,
                 'sector': sector,
-                'value': value}
+                'value': value * 1000}
             data.append(item)
     return data
 

@@ -67,6 +67,11 @@
 			</div>
 		</nav>
 		<div class="container">
+			<h1>Overview</h1>
+			<p>This visualation has been prepared to show the value of completed construction work in Australia from 2001-2015 by state and sector.</p>
+			<p>The data has been extracted from the Australian Bureau of Statistics website which was last updated on the 13th April 2016. The original datasource and report can be found at: <a href="http://www.abs.gov.au/AUSSTATS/abs@.nsf/Lookup/8752.0Main+Features1Dec%202015?OpenDocument" target="_blank">http://www.abs.gov.au/AUSSTATS/abs@.nsf/Lookup/8752.0Main+Features1Dec%202015?OpenDocument</a></p>
+
+			<h1>Visualisation</h1>
 			<h2></h2>
 			<div class="row">
 				<div class="col-md-6">
@@ -78,9 +83,17 @@
 					</div>
 				</div>
 			</div>
-			<div id="divSectors">
+			<div class="row">
+				<div class="col-md-1">
+					<b>Choose Sector: </b>
+				</div>
+				<div class="col-md-11">
+					<div id="divSectors">
 
+					</div>
+				</div>
 			</div>
+			
 		</div>
 		<script type="text/javascript">
 			d3.json("data/data.json", draw);
