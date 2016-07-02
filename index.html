@@ -4,6 +4,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
 		<!-- Latest compiled and minified CSS -->
+		<!-- Latest compiled and minified CSS -->
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
 
 		<!-- Optional theme -->
@@ -20,8 +21,9 @@
 		
 		<!-- Load D3 and Dimple libraries -->
 		<script src="http://d3js.org/d3.v3.min.js"></script>
+		<script src="js/tables.js" type="text/javascript"></script>
 		<script src="js/building.js" type="text/javascript"></script>
-		
+		<script src="js/states.js" type="text/javascript"></script>
 		<style>
 			.line {
 				fill: none;
@@ -43,35 +45,120 @@
 			}
 			#divSectors {
 				float: left;
-      		}
-		     .button {
-		     	float: left;
-		     	margin:2px;
-		     	padding: 5px;
-		     	cursor: pointer;
-		     	background-color: steelblue;
-		     	color:white;
-		     	border:1px solid black;
-		     }
+				border: 1px solid lightGrey;
+			}
+			#divSectors button {
+				margin: 1px;
+				display:inline;
+				width:8em;
+			}
+
+			#divState {
+				border: 1px solid lightGrey;
+				float: left;
+			}
+			#divState button {
+				margin: 1px;
+				display:inline;
+				width:10em;
+			}
+
 
 		</style>
 
 	</head>
 	<body>
 
-		<nav class="navbar navbar-default navbar-static-top">
+		<nav class="navbar navbar-inverse">
 			<div class="container">
 				<div class="navbar-header">
 					<a class="navbar-brand" href="#">Data Visualisation: Value of Construction Work Completed in Australia</a>
+				</div>
+				<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+					<ul class="nav navbar-nav navbar-right">
+						<li>
+							<a href="http://ghunt03.github.io/projects/">
+								<i class="fa fa-folder "></i> Projects
+							</a>
+						</li>
+					</ul>
 				</div>
 			</div>
 		</nav>
 		<div class="container">
 			<h1>Overview</h1>
-			<p>This visualation has been prepared to show the value of completed construction work in Australia from 2001-2015 by state and sector.</p>
+			<p>This visualisation has been prepared to show the value of completed construction work in Australia from 2001-2015 by state and sector. The visualisation is designed to show which sectors has had the most growth over the past 15 years and how much each state is spending on the different sectors.</p>
 			<p>The data has been extracted from the Australian Bureau of Statistics website which was last updated on the 13th April 2016. The original datasource and report can be found at: <a href="http://www.abs.gov.au/AUSSTATS/abs@.nsf/Lookup/8752.0Main+Features1Dec%202015?OpenDocument" target="_blank">http://www.abs.gov.au/AUSSTATS/abs@.nsf/Lookup/8752.0Main+Features1Dec%202015?OpenDocument</a></p>
+			<p>In this visualisation I have also shown when the Global Financial Crisis took place to see how it impacted the construction industry within Australia, and based on industry knowledge the construction industry was fairly well protected due to government initiatives such as the Building Education Revolution project, which seen the Federal Government invest $14 Billion into construction projects in the Education sector.</p>
+			<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
+				State Details
+			</button>
+			<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myDataModal">
+				Data Details
+			</button>
+			<div class="modal fade" id="myDataModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				<div class="modal-dialog" role="document">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+								<span aria-hidden="true">&times;</span>
+							</button>
+							<h4 class="modal-title" id="myModalLabel">Data Details</h4>
+						</div>
+						<div class="modal-body">
+							<p>Before the data could be turned into the visualisations below I first needed to extract the relevant columns from a series of Excel files and then combine the data into a usable JSON format. To achieve this I used a Python script which read each file and return the columns in a JSON format.</p>
+							<p>The JSON file can be downloaded from <a href="/data/data.json" target="_blank">here</a></p>	
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				<div class="modal-dialog" role="document">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+								<span aria-hidden="true">&times;</span>
+							</button>
+							<h4 class="modal-title" id="myModalLabel">State Details</h4>
+						</div>
+						<div class="modal-body">
+							<table class="table" id="tblStates">
 
+							</table>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+						</div>
+					</div>
+				</div>
+			</div>
 			<h1>Visualisation</h1>
+			
+			<div class="row" style="background-color:lightGrey;">
+				<div class="col-md-1">
+					<b>Sector:</b>
+				</div>
+				<div class="col-md-2">
+					<select id="selSector">
+						
+					</select>
+				</div>
+				<div class="col-md-1">
+					<b>States:</b>
+				</div>
+				<div class="col-md-2">
+					<select id="selState">
+						
+					</select>
+				</div>
+				<div class="col-md-1">
+					
+				</div>
+			</div>
+			
 			<h2></h2>
 			<div class="row">
 				<div class="col-md-6">
@@ -83,20 +170,11 @@
 					</div>
 				</div>
 			</div>
-			<div class="row">
-				<div class="col-md-1">
-					<b>Choose Sector: </b>
-				</div>
-				<div class="col-md-11">
-					<div id="divSectors">
-
-					</div>
-				</div>
-			</div>
-			
 		</div>
 		<script type="text/javascript">
 			d3.json("data/data.json", draw);
+			d3.json("data/states.json", table);
+
 		</script>
 	</body>
 	</html>

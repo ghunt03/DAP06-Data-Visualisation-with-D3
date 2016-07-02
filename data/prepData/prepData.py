@@ -89,6 +89,12 @@ def getData():
         results = results + data
     return results
 
+def getStates():
+    stateList = []
+    for key in states:
+        item = {'state': key, 'short_name': states[key]}
+        stateList.append(item)
+    return stateList
 
 
 data = getData()
@@ -96,3 +102,7 @@ file_out = "{0}.json".format("data")
 with open(os.path.join(os.pardir, file_out), "w") as outfile:
     json.dump(data, outfile, indent=4)
 
+stateList = getStates()
+file_out = "{0}.json".format("states")
+with open(os.path.join(os.pardir, file_out), "w") as outfile:
+    json.dump(stateList, outfile, indent=4)

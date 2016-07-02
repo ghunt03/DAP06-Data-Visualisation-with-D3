@@ -1,0 +1,34 @@
+[
+    {
+        "state": "Northern Territory", 
+        "short_name": "NT"
+    }, 
+    {
+        "state": "South Australia", 
+        "short_name": "SA"
+    }, 
+    {
+        "state": "Western Australia", 
+        "short_name": "WA"
+    }, 
+    {
+        "state": "Queensland", 
+        "short_name": "QLD"
+    }, 
+    {
+        "state": "Tasmania", 
+        "short_name": "TAS"
+    }, 
+    {
+        "state": "Australian Capital Territory", 
+        "short_name": "ACT"
+    }, 
+    {
+        "state": "New South Wales", 
+        "short_name": "NSW"
+    }, 
+    {
+        "state": "Victoria", 
+        "short_name": "VIC"
+    }
+]
