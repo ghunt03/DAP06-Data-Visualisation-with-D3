@@ -1,6 +1,6 @@
-var margin = {top: 75, right: 20, bottom: 0, left: 100},
+var margin = {top: 50, right: 20, bottom: 60, left: 100},
         width = 650 - margin.left - margin.right,
-        height = 500 - margin.top - margin.bottom;
+        height = 650 - margin.top - margin.bottom;
 var transitionDuration = 500;
 
 function draw(data) {
@@ -47,13 +47,23 @@ function draw(data) {
         .text('Sector: '+ sector);
     }
 
+
     function formatValue(d) {
         var format = d3.format('0,000');
-            d = format(d / 1e9) + ' B';
-            return d;
+        d = format(d / 1e9) + ' B';
+        return d;
+    }
+    
+    function formatValueCurrency(d) {
+        var format = d3.format('0,000'); 
+        return format(d);
     }
 
-
+    // Define the div for the tooltip
+    var div = d3.select("body")
+        .append("div")   
+        .attr("class", "tooltip")               
+        .style("opacity", 0);
 
     var sectors = d3.set();
     var states = d3.set();
@@ -91,7 +101,7 @@ function draw(data) {
     });
     
     var lineYScale = d3.scale.linear()
-      .range([height, 0])
+      .range([height, margin.top])
       .domain(lineYRange);
 
 
@@ -140,21 +150,42 @@ function draw(data) {
     var valueline = d3.svg.line()
         .x(function(d) { return lineXScale(d.key); })
         .y(function(d) { return lineYScale(d.values['value']); });
-
+    svgLine.append('rect')
+        .attr('fill', 'red')
+        .attr('opacity',0.2)
+        .attr('x', lineXScale(2007))
+        .attr('width', lineXScale(2009) - lineXScale(2007))
+        .attr('y', margin.top)
+        .attr('height', height - margin.top);
     
     
     svgLine.append('path')
         .attr('class', 'line')
         .attr('d', valueline(lineData));
 
+    svgLine.selectAll("circle")    
+        .data(lineData)         
+        .enter()
+        .append("circle")
+        .attr("r", 5)       
+        .attr("cx", function(d) { return lineXScale(d.key); })       
+        .attr("cy", function(d) { return lineYScale(d.values['value']); })
+        .on("mouseover", function(d) {      
+            div.transition()        
+                .duration(200)
+                .style("opacity", 1)          
+            div.html("<b>Year: </b>" + d.key + "<br/><b>Value: </b>"  + formatValueCurrency(d.values['value']))
+                .style("left", (d3.event.pageX) + "px")     
+                .style("top", (d3.event.pageY - 28) + "px");    
+            })                  
+        .on("mouseout", function(d) {       
+            div.transition()        
+                .duration(transitionDuration)      
+                .style("opacity", 0);   
+        });
+
+
     
-    svgLine.append('rect')
-        .attr('fill', 'red')
-        .attr('opacity',0.5)
-        .attr('x', lineXScale(2007))
-        .attr('width', lineXScale(2009) - lineXScale(2007))
-        .attr('y', 0)
-        .attr('height', height);
 
 
     var legend = svgLine.append('g')
@@ -162,7 +193,7 @@ function draw(data) {
         .attr('transform', 'translate('+ (600)+','+10+')');
     legend.append('rect')
         .attr('fill', 'red')
-        .attr('opacity',0.5)
+        .attr('opacity',0.2)
         .attr('width',20)
         .attr('x', -160)
         .attr('y', -15)
@@ -185,7 +216,7 @@ function draw(data) {
     });
     
     var yScale = d3.scale.linear()
-        .range([height, 0])
+        .range([height, margin.top])
         .domain(yExtent);
     
     var yAxis = d3.svg.axis()
@@ -276,7 +307,6 @@ function draw(data) {
             return d;
         });
 
-                        
 
     function updateCharts() {
         var sector = d3.select('#selSector').property('value');
@@ -303,6 +333,16 @@ function draw(data) {
             .duration(transitionDuration)
             .attr('d', valueline(lineData));
         
+
+        svgLine.selectAll('circle')
+            .data(lineData)
+            .transition()
+            .duration(transitionDuration)
+            .attr("r", 5)       
+            .attr("cx", function(d) { return lineXScale(d.key); })       
+            .attr("cy", function(d) { return lineYScale(d.values['value']); });
+
+
         svgLine.select('.y.axis') // change the y axis
             .transition()
             .duration(transitionDuration)
